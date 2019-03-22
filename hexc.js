@@ -9,10 +9,13 @@
 
   let rings = 3;
   let size = 40;
-  for (let x = -rings; x <= rings; x++) {
-    for (let y = -rings; y <= rings; y++) {
-      if (Math.abs(y + x) <= rings) {
-        drawHexagonCoord(ctx, x, y);
+
+  for (let b = -rings, count = 0; b <= rings; b++) {
+    for (let a = -rings; a <= rings; a++) {
+      if (Math.abs(a + b) <= rings) {
+        setTimeout(function() {
+          drawHexagonCoord(ctx, a, b);
+        }, 50*count++);
       }
     }
   }
@@ -22,13 +25,13 @@
     let height = canvas.height;
     let center = { x: (width/2), y: (height/2) };
 
-    let xPos = center.x + (size * q * 1.75) + (size * r * 0.87);
-    let yPos = center.y + (size * r * 1.5);
+    let xPos = center.x + size * (0.88*r + 1.75*q);
+    let yPos = center.y + ((size*1.5) * r);
 
-    drawHexagon(ctx, xPos, yPos, size-2);
+    drawHexagon(ctx, xPos, yPos, size);
 
     let fontS = 0.4;
-    ctx.font = (size*fontS) + 'px Arial';
+    ctx.font = (size*fontS) + 'px sans-serif';
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
     ctx.fillText(q, xPos-(size*fontS), yPos);
@@ -37,9 +40,8 @@
 
   function drawHexagon(ctx, x, y, size) {
     ctx.beginPath();
-    ctx.moveTo(x + size * Math.cos(0), y + size * Math.sin(0));
 
-    for (let side = 1.5; side <= 7.5; side++) {
+    for (let side = 1.5; side < 8; side++) {
       let px = x + size * Math.cos(side * 2 * Math.PI / 6);
       let py = y + size * Math.sin(side * 2 * Math.PI / 6);
       ctx.lineTo(px, py);
@@ -47,6 +49,7 @@
 
     ctx.fillStyle = randomColor();
     ctx.fill();
+    ctx.stroke();
   }
 
   function randomColor() {
