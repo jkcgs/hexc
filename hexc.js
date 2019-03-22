@@ -1,16 +1,39 @@
 (function(d, w) {
   let canvas = d.querySelector('canvas');
-  canvas.style.width = '300px';
-  canvas.style.height = '300px';
-  canvas.style.border = '1px solid #000';
-  canvas.width = 300;
-  canvas.height = 300;
-
   let ctx = canvas.getContext('2d');
-  drawHexagonCoord(ctx, +0, +0, +0);
-  drawHexagonCoord(ctx, -1, +1, +0);
-  drawHexagonCoord(ctx, +1, +1, +0);
-  drawHexagonCoord(ctx, +0, -1, +1);
+  canvas.width = 500;
+  canvas.height = 500;
+  canvas.style.width = canvas.width + 'px';
+  canvas.style.height = canvas.height + 'px';
+  canvas.style.border = '1px solid #000';
+
+  let rings = 3;
+  let size = 40;
+  for (let x = -rings; x <= rings; x++) {
+    for (let y = -rings; y <= rings; y++) {
+      if (Math.abs(y + x) <= rings) {
+        drawHexagonCoord(ctx, x, y);
+      }
+    }
+  }
+
+  function drawHexagonCoord(ctx, q, r) {
+    let width = canvas.width;
+    let height = canvas.height;
+    let center = { x: (width/2), y: (height/2) };
+
+    let xPos = center.x + (size * q * 1.75) + (size * r * 0.87);
+    let yPos = center.y + (size * r * 1.5);
+
+    drawHexagon(ctx, xPos, yPos, size-2);
+
+    let fontS = 0.4;
+    ctx.font = (size*fontS) + 'px Arial';
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.fillText(q, xPos-(size*fontS), yPos);
+    ctx.fillText(r, xPos+(size*fontS), yPos);
+  }
 
   function drawHexagon(ctx, x, y, size) {
     ctx.beginPath();
@@ -24,18 +47,6 @@
 
     ctx.fillStyle = randomColor();
     ctx.fill();
-  }
-
-  function drawHexagonCoord(ctx, x, y, z) {
-    let size = 50;
-    let width = 300;
-    let height = 300;
-    let center = { x: (width/2), y: (height/2) };
-
-    let xPos = center.x + (size * x * 1.75 + (size * x * ((y+1) % 2)));
-    let yPos = center.y + (size * z * -1.25);
-
-    drawHexagon(ctx, xPos, yPos, size);
   }
 
   function randomColor() {
