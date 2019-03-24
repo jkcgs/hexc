@@ -68,18 +68,12 @@
       y: Math.floor((evt.clientY - rect.top) * scaleY)     // been adjusted to be relative to element
     }
   }
-
-  // https://www.redblobgames.com/grids/hexagons/#pixel-to-hex
+  
   function updateSelectedHex(evt) {
     let mx = mousePosition.x - center.x;
     let my = mousePosition.y - center.y;
 
-    let hex = {
-      q: (Math.sqrt(3)/3 * mx - 1/3 * my) / size,
-      r: (2/3 * my) / size
-    };
-
-    selectedHex = cubeToAxial(cubeRound(axialToCube(hex)));
+    selectedHex = pixelToHex(size, mx, my);
   }
 
   canvas.addEventListener('mousemove', function(evt) {

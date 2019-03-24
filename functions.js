@@ -30,6 +30,7 @@ function cubeToAxial(cube) {
   }
 }
 
+// https://www.redblobgames.com/grids/hexagons/#rounding
 function cubeRound(cube) {
   let rx = Math.round(cube.x);
   let ry = Math.round(cube.y);
@@ -48,4 +49,14 @@ function cubeRound(cube) {
   }
 
   return {x: rx, y: ry, z: rz};
+}
+
+// https://www.redblobgames.com/grids/hexagons/#pixel-to-hex
+function pixelToHex(size, mx, my) {
+  let hex = {
+    q: (Math.sqrt(3)/3 * mx - 1/3 * my) / size,
+    r: (2/3 * my) / size
+  };
+
+  return cubeToAxial(cubeRound(axialToCube(hex)));
 }
