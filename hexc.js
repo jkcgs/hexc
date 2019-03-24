@@ -7,18 +7,12 @@
   canvas.style.height = canvas.height + 'px';
   canvas.style.border = '1px solid #000';
 
-  let rings = 3;
-  let size = 40;
+  const center = { x: (canvas.width/2), y: (canvas.height/2) };
 
-  for (let b = -rings, count = 0; b <= rings; b++) {
-    for (let a = -rings; a <= rings; a++) {
-      if (Math.abs(a + b) <= rings) {
-        setTimeout(function() {
-          drawHexagonCoord(ctx, a, b);
-        }, 50*count++);
-      }
-    }
-  }
+  let size = 40;
+  let selectedHex = {q: 2, r: 0};
+  let mousePosition = {x: 0, y: 0};
+  loop();
 
   function drawHexagonCoord(ctx, q, r) {
     let width = canvas.width;
@@ -28,7 +22,9 @@
     let xPos = center.x + size * (0.88*r + 1.75*q);
     let yPos = center.y + ((size*1.5) * r);
 
-    drawHexagon(ctx, xPos, yPos, size);
+    let selected = q === selectedHex.q && r === selectedHex.r;
+    let color = selected ? '#eca' : '#a97';
+    drawHexagon(ctx, xPos, yPos, size, color);
 
     let fontS = 0.4;
     ctx.font = (size*fontS) + 'px sans-serif';
@@ -38,24 +34,59 @@
     ctx.fillText(r, xPos+(size*fontS), yPos);
   }
 
-  function drawHexagon(ctx, x, y, size) {
-    ctx.beginPath();
-
-    for (let side = 1.5; side < 8; side++) {
-      let px = x + size * Math.cos(side * 2 * Math.PI / 6);
-      let py = y + size * Math.sin(side * 2 * Math.PI / 6);
-      ctx.lineTo(px, py);
-    }
-
-    ctx.fillStyle = randomColor();
-    ctx.fill();
-    ctx.stroke();
-  }
-
   function randomColor() {
     let r = Math.floor(Math.random() * 256);
     let g = Math.floor(Math.random() * 256);
     let b = Math.floor(Math.random() * 256);
     return `rgb(${r}, ${g}, ${b})`;
   }
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let rings = 3;
+
+    for (let b = -rings, count = 0; b <= rings; b++) {
+      for (let a = -rings; a <= rings; a++) {
+        if (Math.abs(a + b) <= rings) {
+          drawHexagonCoord(ctx, a, b);
+        }
+      }
+    }
+
+    setTimeout(loop, 100/6);
+  }
+
+  // https://stackoverflow.com/a/17130415
+  function updateMousePosition(evt) {
+    let rect = canvas.getBoundingClientRect(), // abs. size of element
+        scaleX = canvas.width / rect.width,    // relationship bitmap vs. element for X
+        scaleY = canvas.height / rect.height;  // relationship bitmap vs. element for Y
+
+    mousePosition = {
+      x: Math.floor((evt.clientX - rect.left) * scaleX),   // scale mouse coordinates after they have
+      y: Math.floor((evt.clientY - rect.top) * scaleY)     // been adjusted to be relative to element
+    }
+  }
+
+  // https://www.redblobgames.com/grids/hexagons/#pixel-to-hex
+  function updateSelectedHex(evt) {
+    let mx = mousePosition.x - center.x;
+    let my = mousePosition.y - center.y;
+
+    let hex = {
+      q: (Math.sqrt(3)/3 * mx - 1/3 * my) / size,
+      r: (2/3 * my) / size
+    };
+
+    selectedHex = cubeToAxial(cubeRound(axialToCube(hex)));
+  }
+
+  canvas.addEventListener('mousemove', function(evt) {
+    updateMousePosition(evt);
+    updateSelectedHex(evt);
+
+    d.querySelectorAll('pre')[0].textContent = `Mouse: ${mousePosition.x}, ${mousePosition.y}\n`;
+    d.querySelectorAll('pre')[0].textContent += `Hex: ${selectedHex.q}, ${selectedHex.r}`;
+  });
 })(document, window);
