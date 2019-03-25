@@ -11,6 +11,7 @@ function drawHexagon(ctx, x, y, size, color) {
 
   ctx.fillStyle = color;
   ctx.fill();
+  ctx.strokeStyle = '#333';
   ctx.stroke();
 }
 
